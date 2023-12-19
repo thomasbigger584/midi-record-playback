@@ -9,10 +9,13 @@ sudo apt-get install arecordmidi timidity ffmpeg mpg123 -y
 ```
 
 ## Usage 
-- In your terminal run the following command
 
-```bash
-./record.sh
+```
+Usage: ./record.sh [--client client_name] [--output output_file] [--countdown countdown]
+Options:
+  --client: Client name (default: ARIUS)
+  --output: Output file (default: output)
+  --countdown: Countdown value (default: 5s)
 ```
 
 - Stop the Recording

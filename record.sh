@@ -5,9 +5,59 @@ set -e
 # Parameters
 ##################################################
 
-client_name="ARIUS"
-output_file="output"
-countdown=5
+default_client_name="ARIUS"
+default_output_file="output"
+default_countdown=5
+
+client_name=$default_client_name
+output_file=$default_output_file
+countdown=$default_countdown
+
+# Function to display usage
+function display_usage {
+    echo "Usage: $0 [--client client_name] [--output output_file] [--countdown countdown]"
+    echo "Options:"
+    echo "  --client: Client name (default: $default_client_name)"
+    echo "  --output: Output file (default: $default_output_file)"
+    echo "  --countdown: Countdown value (default: ${default_countdown}s)"
+    exit 1
+}
+
+function is_integer {
+    [[ "$1" =~ ^[0-9]+$ ]]
+}
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --client)
+            if [[ "$2" == --* ]]; then
+                echo "Error: Client name cannot start with '--'."
+                display_usage
+            fi
+            client_name="$2"
+            shift 2
+            ;;
+        --output)
+            if [[ "$2" == --* ]]; then
+                echo "Error: Output file cannot start with '--'."
+                display_usage
+            fi
+            output_file="$2"
+            shift 2
+            ;;
+        --countdown)
+            if ! is_integer "$2"; then
+                echo "Error: Countdown must be an integer."
+                display_usage
+            fi
+            countdown="$2"
+            shift 2
+            ;;
+        *)
+            display_usage
+            ;;
+    esac
+done
 
 ##################################################
 # Functions
