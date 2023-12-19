@@ -91,6 +91,7 @@ start_recording() {
       rm "$mid_file"
   fi
   echo "Recording...  (CTRL+C to stop)"
+  trap convert_midi_to_mp3 INT
   arecordmidi --port "$1" "$mid_file"
 }
 
@@ -113,11 +114,9 @@ play() {
 ##################################################
 # Execution
 ##################################################
-trap convert_midi_to_mp3 INT
 
 midi_port=$(get_midi_port)
 countdown
 start_recording "$midi_port"
 
-echo "Done"
 exit 0
