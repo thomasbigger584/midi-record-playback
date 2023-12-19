@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 set -e
 
+##################################################
+# Parameters
+##################################################
+
 client_name="ARIUS"
 output_file="output"
+countdown=5
+
+##################################################
+# Functions
+##################################################
 
 get_midi_port() {
   device_output=$(arecordmidi -l)
@@ -16,13 +25,21 @@ get_midi_port() {
   fi
 }
 
+countdown() {
+  while [ $countdown -gt 0 ]; do
+      echo "$countdown..."
+      sleep 1
+      ((countdown--))
+  done
+}
+
 start_recording() {
   local mid_file
   mid_file="$output_file.mid"
   if [ -e "$mid_file" ]; then
       rm "$mid_file"
   fi
-  echo "Recording..."
+  echo "Recording...  (CTRL+C to stop)"
   arecordmidi --port "$1" "$mid_file"
 }
 
@@ -43,7 +60,11 @@ play() {
   mpg123 "$1"
 }
 
+##################################################
+# Execution
+##################################################
 midi_port=$(get_midi_port)
+countdown
 start_recording "$midi_port"
 
 echo "Done"
