@@ -14,8 +14,9 @@ countdown=5
 ##################################################
 
 get_midi_port() {
-  device_output=$(arecordmidi -l)
+  local device_output
   local port;
+  device_output=$(arecordmidi -l)
   port=$(echo "$device_output" | grep "$client_name" | awk '{print $1}')
   if [ -n "$port" ]; then
       echo "$port"
@@ -50,19 +51,20 @@ convert_midi_to_mp3() {
       rm "$mp3_file"
   fi
   echo "Converting MIDI to MP3..."
-  timidity "$output_file.mid" -Ow -o - | ffmpeg -i - -acodec libmp3lame -ab 64k "$mp3_file"
+  timidity "$output_file.mid" -Ow -o -| ffmpeg -i - -acodec libmp3lame -ab 64k "$mp3_file" > /dev/null 2>&1
   play "$mp3_file"
 }
-trap convert_midi_to_mp3 INT
 
 play() {
   echo "Playing $1..."
-  mpg123 "$1"
+  mpg123 "$1" > /dev/null 2>&1
 }
 
 ##################################################
 # Execution
 ##################################################
+trap convert_midi_to_mp3 INT
+
 midi_port=$(get_midi_port)
 countdown
 start_recording "$midi_port"
