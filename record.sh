@@ -63,6 +63,18 @@ done
 # Functions
 ##################################################
 
+mid_file="$output_file.mid"
+mp3_file="$output_file.mp3"
+
+delete_conflicting_files() {
+  if [ -e "$mid_file" ]; then
+      rm "$mid_file"
+  fi
+  if [ -e "$mp3_file" ]; then
+      rm "$mp3_file"
+  fi
+}
+
 get_midi_port() {
   local device_output
   local port;
@@ -77,20 +89,16 @@ get_midi_port() {
 }
 
 countdown() {
-  while [ $countdown -gt 0 ]; do
-      echo "$countdown..."
+  while [ "$countdown" -gt 0 ]; do
+      echo "${countdown}..."
       sleep 1
       ((countdown--))
   done
 }
 
 start_recording() {
-  local mid_file
-  mid_file="$output_file.mid"
-  if [ -e "$mid_file" ]; then
-      rm "$mid_file"
-  fi
-  echo "Recording...  (CTRL+C to stop)"
+  delete_conflicting_files
+  echo "Recording...  (CTRL+C to stop recording)"
   trap finish INT
   arecordmidi --port "$1" "$mid_file"
 }
@@ -98,17 +106,12 @@ start_recording() {
 finish() {
   trap - INT
   convert_midi_to_mp3
+  play "$mp3_file"
 }
 
 convert_midi_to_mp3() {
-  local mp3_file
-  mp3_file="$output_file.mp3"
-  if [ -e "$mp3_file" ]; then
-      rm "$mp3_file"
-  fi
   echo "Converting MIDI to MP3..."
   timidity "$output_file.mid" -Ow -o -| ffmpeg -i - -acodec libmp3lame -ab 64k "$mp3_file" > /dev/null 2>&1
-  play "$mp3_file"
 }
 
 play() {
