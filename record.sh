@@ -91,8 +91,13 @@ start_recording() {
       rm "$mid_file"
   fi
   echo "Recording...  (CTRL+C to stop)"
-  trap convert_midi_to_mp3 INT
+  trap finish INT
   arecordmidi --port "$1" "$mid_file"
+}
+
+finish() {
+  trap - INT
+  convert_midi_to_mp3
 }
 
 convert_midi_to_mp3() {
